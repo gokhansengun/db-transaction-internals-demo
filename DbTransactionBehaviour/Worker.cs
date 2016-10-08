@@ -20,13 +20,9 @@ namespace DbTransactionBehaviour
                 
                 using (var transaction = sqlConnection.BeginTransaction(IsolationLevel.ReadCommitted))
                 {
-                    var rand = new Random();
-                    var theName = rand.Next(100000, 1000000).ToString();
-                    var theId = rand.Next(10, 100);
-
                     using (var sqlCommand = sqlConnection.CreateCommand())
                     {
-                        sqlCommand.CommandText = $"INSERT INTO \"Employee\"(name, id) VALUES('{theName}',{theId})";
+                        sqlCommand.CommandText = "SELECT 1";
                         sqlCommand.CommandType = CommandType.Text;
                         sqlCommand.Transaction = transaction;
 
