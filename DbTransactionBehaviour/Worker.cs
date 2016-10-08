@@ -5,6 +5,7 @@ using System.Data.Common;
 using System.Data.SqlClient;
 using System.Threading;
 using Npgsql;
+using IsolationLevel = System.Data.IsolationLevel;
 
 namespace DbTransactionBehaviour
 {
@@ -16,28 +17,29 @@ namespace DbTransactionBehaviour
             using (var sqlConnection = NewDbConnection(connStr))
             {
                 sqlConnection.Open();
-
-                var transaction = sqlConnection.BeginTransaction(IsolationLevel.ReadCommitted);
-
-                var rand = new Random();
-                var theName = rand.Next(100000, 1000000).ToString();
-                var theId = rand.Next(10, 100);
-
-                using (var sqlCommand = sqlConnection.CreateCommand())
+                
+                using (var transaction = sqlConnection.BeginTransaction(IsolationLevel.ReadCommitted))
                 {
-                    sqlCommand.CommandText = $"INSERT INTO \"Employee\"(name, id) VALUES('{theName}',{theId})";
-                    sqlCommand.CommandType = CommandType.Text;
-                    sqlCommand.Transaction = transaction;
+                    var rand = new Random();
+                    var theName = rand.Next(100000, 1000000).ToString();
+                    var theId = rand.Next(10, 100);
 
-                    Console.WriteLine($"Executing the command for index: {taskId}");
+                    using (var sqlCommand = sqlConnection.CreateCommand())
+                    {
+                        sqlCommand.CommandText = $"INSERT INTO \"Employee\"(name, id) VALUES('{theName}',{theId})";
+                        sqlCommand.CommandType = CommandType.Text;
+                        sqlCommand.Transaction = transaction;
 
-                    sqlCommand.ExecuteNonQuery();
+                        Console.WriteLine($"Executing the command for index: {taskId}");
 
-                    Thread.Sleep(6000);
+                        sqlCommand.ExecuteNonQuery();
 
-                    transaction.Commit();
+                        Thread.Sleep(6000);
 
-                    Console.WriteLine($"Committed for index: {taskId}");
+                        transaction.Commit();
+
+                        Console.WriteLine($"Committed for index: {taskId}");
+                    }
                 }
             }
         }

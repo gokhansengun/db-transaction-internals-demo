@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Threading.Tasks;
 
 namespace DbTransactionBehaviour
@@ -34,6 +33,10 @@ namespace DbTransactionBehaviour
                 try
                 {
                     Task.WaitAll(tasks.ToArray());
+
+                    // reaching here means that all tasks
+                    // have completed without any problem
+                    break;
                 }
                 catch (AggregateException ae)
                 {
