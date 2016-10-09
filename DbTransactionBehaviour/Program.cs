@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace DbTransactionBehaviour
@@ -9,8 +10,9 @@ namespace DbTransactionBehaviour
         static void Main(string[] args)
         {
             List<Task> tasks = new List<Task>();
-            int totalTaskNumber = int.Parse(args.Length == 0 ? "4" : args[0]);
-
+            int totalTaskNumber = int.Parse(args.Length == 0 ? "20" : args[0]);
+            int totalLoopCount = int.Parse(args.Length == 0 ? "100" : args[0]);
+            
             for (var i = 0; i < totalTaskNumber; ++i)
             {
                 var threadId = i;
@@ -19,12 +21,17 @@ namespace DbTransactionBehaviour
                 {
                     var worker = new Worker();
 
-                    worker.Run(threadId);
+                    worker.Run(threadId, totalLoopCount);
 
                 }, TaskCreationOptions.LongRunning);
 
                 tasks.Add(tsk);
             }
+
+            var sw = new Stopwatch();
+
+            // starting the timer here
+            sw.Start();
 
             tasks.ForEach(t => t.Start());
 
@@ -59,6 +66,11 @@ namespace DbTransactionBehaviour
                     tasks = newTaskList;
                 }
             }
+
+            sw.Stop();
+
+            Console.WriteLine($"Putting {totalLoopCount} for each of " +
+                              $"{totalTaskNumber} took {sw.ElapsedMilliseconds} milliseconds");
         }
     }
 }

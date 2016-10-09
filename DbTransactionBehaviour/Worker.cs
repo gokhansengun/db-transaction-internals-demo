@@ -3,6 +3,7 @@ using System.Configuration;
 using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
+using System.Runtime.InteropServices;
 using System.Threading;
 using Npgsql;
 using IsolationLevel = System.Data.IsolationLevel;
@@ -11,30 +12,34 @@ namespace DbTransactionBehaviour
 {
     class Worker
     {
-        public void Run(int taskId)
+        public void Run(int taskId, int totalLoops)
         {
             var connStr = ConfigurationManager.ConnectionStrings[ConnStrName].ToString();
-            using (var sqlConnection = NewDbConnection(connStr))
+
+            for (var i = 0; i < totalLoops; ++i)
             {
-                sqlConnection.Open();
-                
-                using (var transaction = sqlConnection.BeginTransaction(IsolationLevel.ReadCommitted))
+                using (var sqlConnection = NewDbConnection(connStr))
                 {
-                    using (var sqlCommand = sqlConnection.CreateCommand())
+                    sqlConnection.Open();
+
+                    using (var transaction = sqlConnection.BeginTransaction(IsolationLevel.ReadCommitted))
                     {
-                        sqlCommand.CommandText = "SELECT 1";
-                        sqlCommand.CommandType = CommandType.Text;
-                        sqlCommand.Transaction = transaction;
+                        using (var sqlCommand = sqlConnection.CreateCommand())
+                        {
+                            sqlCommand.CommandText = "SELECT 1";
+                            sqlCommand.CommandType = CommandType.Text;
+                            sqlCommand.Transaction = transaction;
 
-                        Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss")} Executing the command for threadId: {taskId}");
+                            Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss")} Executing the command for threadId: {taskId}");
 
-                        sqlCommand.ExecuteNonQuery();
+                            sqlCommand.ExecuteNonQuery();
 
-                        Thread.Sleep(6000);
+                            Thread.Sleep(100);
 
-                        transaction.Commit();
+                            transaction.Commit();
 
-                        Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss")} Committed for threadId: {taskId}");
+                            Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss")} Committed for threadId: {taskId}");
+                        }
                     }
                 }
             }
