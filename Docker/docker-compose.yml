@@ -1,0 +1,26 @@
+version: '2'
+
+services:
+
+  app:
+    image: mono:latest
+    volumes:
+      - artifact:/artifact
+    command: [ "mono",  "/artifact/DbTransactionBehaviour.exe" ]
+
+  build:
+    image: mono-transaction-build  
+    build:
+      context: ../
+      dockerfile: ./Docker/Dockerfile-Mono-Build
+    volumes:
+      - artifact:/artifact
+
+  postgres-db:
+    image: postgres:9.4
+    ports:
+      - "5432:5432"
+
+volumes:
+  artifact:
+    driver: local

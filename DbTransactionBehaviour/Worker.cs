@@ -26,7 +26,7 @@ namespace DbTransactionBehaviour
                         sqlCommand.CommandType = CommandType.Text;
                         sqlCommand.Transaction = transaction;
 
-                        Console.WriteLine($"Executing the command for index: {taskId}");
+                        Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss")} Executing the command for threadId: {taskId}");
 
                         sqlCommand.ExecuteNonQuery();
 
@@ -34,7 +34,7 @@ namespace DbTransactionBehaviour
 
                         transaction.Commit();
 
-                        Console.WriteLine($"Committed for index: {taskId}");
+                        Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss")} Committed for threadId: {taskId}");
                     }
                 }
             }

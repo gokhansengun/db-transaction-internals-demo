@@ -9,17 +9,17 @@ namespace DbTransactionBehaviour
         static void Main(string[] args)
         {
             List<Task> tasks = new List<Task>();
-            int totalTaskNumber = int.Parse(args.Length == 0 ? "20" : args[0]);
+            int totalTaskNumber = int.Parse(args.Length == 0 ? "4" : args[0]);
 
             for (var i = 0; i < totalTaskNumber; ++i)
             {
-                var index = i;
+                var threadId = i;
 
                 Task tsk = new Task(() =>
                 {
                     var worker = new Worker();
 
-                    worker.Run(index);
+                    worker.Run(threadId);
 
                 }, TaskCreationOptions.LongRunning);
 
@@ -42,7 +42,7 @@ namespace DbTransactionBehaviour
                 {
                     foreach (var innerException in ae.InnerExceptions)
                     {
-                        Console.WriteLine($"EXCEPTION: {innerException.Message}");
+                        Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss")} EXCEPTION: with {innerException.Message}");
                     }
                     
                     var newTaskList = new List<Task>();
