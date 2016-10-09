@@ -4,8 +4,8 @@ using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
 using System.Threading;
+using System.Transactions;
 using Npgsql;
-using IsolationLevel = System.Data.IsolationLevel;
 
 namespace DbTransactionBehaviour
 {
@@ -17,14 +17,13 @@ namespace DbTransactionBehaviour
             using (var sqlConnection = NewDbConnection(connStr))
             {
                 sqlConnection.Open();
-                
-                using (var transaction = sqlConnection.BeginTransaction(IsolationLevel.ReadCommitted))
+
+                using (var tran = new TransactionScope())
                 {
                     using (var sqlCommand = sqlConnection.CreateCommand())
                     {
                         sqlCommand.CommandText = "SELECT 1";
                         sqlCommand.CommandType = CommandType.Text;
-                        sqlCommand.Transaction = transaction;
 
                         Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss")} Executing the command for threadId: {taskId}");
 
@@ -32,7 +31,7 @@ namespace DbTransactionBehaviour
 
                         Thread.Sleep(6000);
 
-                        transaction.Commit();
+                        tran.Complete();
 
                         Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss")} Committed for threadId: {taskId}");
                     }
