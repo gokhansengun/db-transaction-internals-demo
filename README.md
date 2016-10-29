@@ -2,7 +2,7 @@
 
 This repository is used in the blog post digging database transaction internals below.
 
-[www.gokhansengun.com/why-do-long-db-transactions-affect-performance](www.gokhansengun.com/why-do-long-db-transactions-affect-performance)
+[http://www.gokhansengun.com/why-do-long-db-transactions-affect-performance](http://www.gokhansengun.com/why-do-long-db-transactions-affect-performance)
 
 ## Excerpt from the blog post
 
